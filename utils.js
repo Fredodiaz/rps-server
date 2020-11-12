@@ -1,13 +1,28 @@
-const makeid =(length) => {
-   var result           = '';
-   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-   var charactersLength = characters.length;
-   for ( var i = 0; i < length; i++ ) {
-      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+/* Returns Random 5 Digit Code */
+const makeid = (length) => {
+   length -= 1
+   let multiplier = 1
+   for(let i = 0; i < length; i++) {
+      multiplier *= 10
    }
-   return result;
+   return Math.floor(Math.random()*(9 * multiplier)) + (1 * multiplier);
+}
+
+/* Returns # Of Bots Needed To Make A Game Of Base2 # Of Players */
+const botsNeeded = (numOfPlayers) => {
+   let sequence = 2
+   let remainder = 0;
+
+   while(numOfPlayers > sequence) {
+      sequence *= 2
+      if(sequence > numOfPlayers) {
+         remainder = sequence - numOfPlayers
+         return remainder
+      }
+   }
 }
 
 module.exports = {
    makeid,
+   botsNeeded,
 }
