@@ -13,11 +13,17 @@ const botsNeeded = (numOfPlayers) => {
    let sequence = 2
    let remainder = 0;
 
+   if(sequence === numOfPlayers) {
+      return 0
+   }
    while(numOfPlayers > sequence) {
       sequence *= 2
       if(sequence > numOfPlayers) {
          remainder = sequence - numOfPlayers
          return remainder
+      }
+      if(sequence === numOfPlayers) {
+         return 0
       }
    }
 }

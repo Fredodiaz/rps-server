@@ -1,7 +1,7 @@
 const io = require('socket.io')();
 const PORT = 8080
 
-const { handleHostLeaveGame, handleJoinGame, handleNewGame, removePlayer } = require('./functions')
+const { handleHostLeaveGame, handleJoinGame, handleNewGame, removePlayer, refreshLobbyPlayers, handleHostStartsGame, getPlayerOpponent } = require('./functions')
 
 io.on('connection', client => {
   console.log('CONNECTED')
@@ -12,9 +12,10 @@ io.on('connection', client => {
   client.on('hostGame', () => handleNewGame(client));
   client.on('leaveLobby', () => removePlayer(io, client));
   client.on('hostLeaveGame', () => handleHostLeaveGame(io, client))
+  client.on('hostStartedGame', () => handleHostStartsGame(io, client))
+  client.on('refreshLobbyPlayers', () => refreshLobbyPlayers(io, client.currentRoomName))
+  client.on('findPlayerOpponent', () => getPlayerOpponent(client))
 
-  // client.join('GAME')
-  // console.log(io.sockets.adapter.rooms['GAME'], 'ROOMS BOI BOIIII')
   client.on('disconnect', () => {
     removePlayer(io, client)
 
