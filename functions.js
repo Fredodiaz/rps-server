@@ -16,8 +16,9 @@ const handleJoinGame = (io, client, roomName) => {
     if(gameAvailable) {
         client.name = makeid(3);  // gives client name
         client.currentRoomName = roomName // gives client game joined
-        DATA[roomName].push({name: client.name, id: makeid(4), bot: false}) // adds client to players list with properties
+        DATA[roomName].push({name: client.name, id: client.id, bot: false}) // adds client to players list with properties
         client.join(roomName);
+        console.log('PLAYER JOINED:', roomName)
         client.emit('handlePersonJoinAttempt', client.name);
     } else {
         client.emit('handlePersonJoinAttempt', false);
@@ -44,7 +45,7 @@ const handleNewGame = (client) => {
 const removePlayer = (io, client) => {
     let roomName = client.currentRoomName
     if(DATA[roomName]) {
-        DATA[roomName] = [...DATA[roomName].filter(player => player.name !== client.name)]
+        DATA[roomName] = [...DATA[roomName].filter(player => player.name !== client.name)] // player.id !== client.id ?????
     }
     refreshLobbyPlayers(io, roomName)
     client.leave(roomName)
@@ -72,7 +73,7 @@ const handleHostLeaveGame = (io, client) => {
     }
     client.host = false
     client.currentRoomName = ''
-    console.log('CLIENT ROOMS', PlayerRooms)
+    // console.log('CLIENT ROOMS', PlayerRooms)
 }
 
 
@@ -83,9 +84,10 @@ const handleHostStartsGame = (io, client) => {
     if(DATA[client.currentRoomName]) {
         numberOfPlayers = DATA[client.currentRoomName].length
     }
-    io.emit('startedGame')
     addBots(client.currentRoomName, botsNeeded(numberOfPlayers))
     pairUpPlayersWithBots(io, client.currentRoomName)
+    io.to(client.currentRoomName).emit('startedGame') // redirects player to /game
+    io.to(client.currentRoomName).emit('startedNewRound')
 }
 
 
@@ -93,7 +95,7 @@ const handleHostStartsGame = (io, client) => {
 /* Add Bots */
 const addBots = ( roomName, val ) => {
     for(let i = 0; i < val; i++) {
-        DATA[roomName].push({name: makeid(3), id: makeid(4), bot: true})
+        DATA[roomName].push({name: makeid(3), id: makeid(9), bot: true})
     }
 }
 
@@ -135,9 +137,11 @@ const pairUpPlayersWithPlayers = (io, roomName) => {
                     // console.log(!DATA[roomName][j].opponent && !DATA[roomName][j].bot, 'PLAYER IS BEING FOUND', j)
                     DATA[roomName][j].opponent = {
                         name: DATA[roomName][i].name,
+                        id: DATA[roomName][i].id,
                     }
                     DATA[roomName][i].opponent = {
                         name: DATA[roomName][j].name,
+                        id: DATA[roomName][j].id,
                     }
                     break;
                 }
@@ -146,20 +150,29 @@ const pairUpPlayersWithPlayers = (io, roomName) => {
     }
 
     refreshLobbyPlayers(io, roomName)
-    console.log(DATA[roomName])
+    // console.log(DATA[roomName])
 }
 
 
 
+
+/* ############################### NEW FUNCTIONS BELOW ################################ */
+
+
 /* Adds Given Move To Player */
 const handlePlayerMove = (client, move) => {
+
     client.currentMove = move
     let playerCount = DATA[client.currentRoomName].length
     for(let i = 0; i < playerCount; i++) {
         if(DATA[client.currentRoomName][i].name === client.name) {
             DATA[client.currentRoomName][i].currentMove = move
         }
-    }
+    } 
+
+    console.log('CLIENTMOVE', move, client.name)
+    client.emit('returnMove')
+
 }
 
 const handleBotMove = () => {
@@ -231,22 +244,6 @@ THAT INFO WILL BE BASSED TO NEW ALGO TO DETERMINE WINNERS
 /*
 */
 
-
-//  ##### TESTS #####
-// DATA['123'] = [
-//     {name: makeid(3), id: makeid(4), bot: true},
-//     {name: makeid(3), id: makeid(4), bot: false},
-//     {name: makeid(3), id: makeid(4), bot: false},
-//     {name: makeid(3), id: makeid(4), bot: false},
-//     {name: makeid(3), id: makeid(4), bot: true},
-//     {name: makeid(3), id: makeid(4), bot: false},
-//     {name: makeid(3), id: makeid(4), bot: false},
-//     {name: makeid(3), id: makeid(4), bot: true},
-// ]
-
-// pairUpPlayersWithBots('test', '123')
-// getPlayerOpponent('test', '123')
-
 // console.log('SOCKETS', io.sockets.adapter.rooms[roomName]);
 // console.log('CLIENT', client.adapter.rooms)
 // Object.keys(client.adapter.rooms)[0] // GET ROOMS
@@ -259,6 +256,8 @@ module.exports = {
     handleHostStartsGame,
     handleJoinGame,
     handleNewGame,
+    handlePlayerMove,
     refreshLobbyPlayers,
     removePlayer,
+    
 }
