@@ -1,4 +1,4 @@
-const { makeid, botsNeeded } = require('./utils')
+const { makeid, getNumberOfRoundsNeeded } = require('./utils')
 const ROOM = '123'
 
 /* Pair Up Players With Bots */
@@ -113,7 +113,7 @@ const updatePlayerAgainstBotScore = (client, opponentAppropriateMove, index, dec
     if(totalClientPoints >= 3) {
         DATA[ROOM][index].wonRound = true // true for win
         DATA[ROOM][index].searchingNewMatch = true
-        console.log(client.name, "WON MATCH AGAINST BOT", client.opponent.name)
+        // console.log(client.name, "WON MATCH AGAINST BOT", client.opponent.name)
     }
 
     // console.log('finna tell', client.name, decidingFactor, 'and got', totalClientPoints, 'points against bot', client.opponent.name, totalOpponentPoints) // gonna delete currentMove too
@@ -199,13 +199,13 @@ const updatePlayerScores = (client, opponent, decidingFactor) => {
         DATA[ROOM][opponentIndex].wonRound = false
         DATA[ROOM][clientIndex].searchingNewMatch = true
         DATA[ROOM][opponentIndex].searchingNewMatch = true
-        console.log(client.name, "WON MATCH AGAINST PLAYER", client.opponent.name)
+        // console.log(client.name, "WON MATCH AGAINST PLAYER", client.opponent.name)
     } else if(totalOpponentPoints >= 3) {
         DATA[ROOM][opponentIndex].wonRound = true
         DATA[ROOM][clientIndex].wonRound = false
         DATA[ROOM][clientIndex].searchingNewMatch = true
         DATA[ROOM][opponentIndex].searchingNewMatch = true
-        console.log(client.opponent.name, "WON MATCH AGAINST PLAYER", client.name)
+        // console.log(client.opponent.name, "WON MATCH AGAINST PLAYER", client.name)
     }
 
 
@@ -309,6 +309,13 @@ const resetPlayersForNewMatch = () => {
 }
 
 
+/* Add Bots */
+const addBots = ( roomName, val ) => {
+    for(let i = 0; i < val; i++) {
+        DATA[roomName].push({name: makeid(3), id: makeid(9), bot: true})
+    }
+}
+
 
 
 
@@ -339,17 +346,23 @@ DATA[ROOM] = [ // 5 bots 11 players // 16 total
     {name: makeid(3), id: makeid(4), bot: false},
 ]
 
+let totalRoundsBeforeFinal = getNumberOfRoundsNeeded(DATA[ROOM].length)
+let isFinalRound = false
 
+for(let a = 0; a <= totalRoundsBeforeFinal; a++) {
 
-for(let a = 0; a < 3; a++) {
-    pairUpPlayersWithBots(ROOM)
-    getPlayerOpponent(ROOM)
+    if(a === totalRoundsBeforeFinal) {
+        console.log("THIS IS FINAL ROUND")
+        isFinalRound = true;
+    }
+
+    pairUpPlayersWithBots(ROOM) // also pairs players
 
     /* ### PLAYERS PAIRED WITH BOT OR PERSON AND BATTLING STARTS #### */
     let h = 0;
     while(h >= 0 && h < 100) {
         let playersBattling = 0;
-        console.log(`ROUND ${h + 1}`)
+        // console.log(`ROUND ${h + 1}`)
         for(let i = 0; i < DATA[ROOM].length; i++) {
             if(!DATA[ROOM][i].bot && !DATA[ROOM][i].searchingNewMatch) { // simulate bot not having turn
                 handlePlayerMove(DATA[ROOM][i], ROOM) // ################ WHERE SERVER TELLS CLIENT TO START TIMER
@@ -358,20 +371,15 @@ for(let a = 0; a < 3; a++) {
         }
 
         if(playersBattling === 0) {
-            console.log("FIRST MATCH IS OVER")
-            resetPlayersForNewMatch()
-            console.log(DATA[ROOM])
+            if(isFinalRound) {
+                console.log(DATA[ROOM][0].name, "IS THE TOURNAMENT WINNER")
+            } else {
+                console.log(a + 1, "MATCH IS OVER")
+                resetPlayersForNewMatch()
+                console.log(DATA[ROOM])
+            }
             break
         }
         h++
     }
 }
-
-
-
-
-
-
-
-
-// brody said that's outragous 
