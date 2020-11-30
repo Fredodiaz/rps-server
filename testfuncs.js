@@ -328,28 +328,29 @@ let DATA = {}
 DATA[ROOM] = [ // 5 bots 11 players // 16 total
     {name: makeid(3), id: makeid(4), bot: false}, // 6 players 2 bots
     {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: true},
-    {name: makeid(3), id: makeid(4), bot: true},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: true},
+    // {name: makeid(3), id: makeid(4), bot: true},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false},
     
 
-    {name: makeid(3), id: makeid(4), bot: false}, // 5 players 3 bots
-    {name: makeid(3), id: makeid(4), bot: true},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: true},
-    {name: makeid(3), id: makeid(4), bot: true},
-    {name: makeid(3), id: makeid(4), bot: false},
-    {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false}, // 5 players 3 bots
+    // {name: makeid(3), id: makeid(4), bot: true},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: true},
+    // {name: makeid(3), id: makeid(4), bot: true},
+    // {name: makeid(3), id: makeid(4), bot: false},
+    // {name: makeid(3), id: makeid(4), bot: false},
 ]
 
 let totalRoundsBeforeFinal = getNumberOfRoundsNeeded(DATA[ROOM].length)
 let isFinalRound = false
 
-for(let a = 0; a <= totalRoundsBeforeFinal; a++) {
+for(let a = 0; a <= totalRoundsBeforeFinal; a++) { // Each Round Start
+     // One Round Started
 
     if(a === totalRoundsBeforeFinal) {
         console.log("THIS IS FINAL ROUND")
