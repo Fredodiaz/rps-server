@@ -28,7 +28,25 @@ const botsNeeded = (numOfPlayers) => {
    }
 }
 
+/* Number Of Rounds Needed Before Final Round Based on Initial Players */
+const getNumberOfRoundsNeeded = (numPlayers) => {
+   console.log('num play', numPlayers)
+   let totalNumOfPlayers = botsNeeded(numPlayers) + numPlayers
+   console.log('Total # of players', totalNumOfPlayers)
+   let totalRoundsNeeded = 0;
+   while(totalNumOfPlayers > 2) {
+       totalRoundsNeeded++
+       totalNumOfPlayers /= 2
+   }
+   console.log('Total # of rounds before final round', totalRoundsNeeded)
+   return totalRoundsNeeded
+}
+
+
+// getNumberOfRoundsNeeded(24)
+
 module.exports = {
    makeid,
    botsNeeded,
+   getNumberOfRoundsNeeded
 }
