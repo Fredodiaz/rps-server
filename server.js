@@ -9,12 +9,13 @@ io.on('connection', client => {
 
 
   // LOBBY JOIN/LEAVE/HOST ENDPOINTS
-  client.on('joinGame', (roomName) => handleJoinGame(io, client, roomName));
+  client.on('joinGame', (roomName, userName) => handleJoinGame(io, client, roomName, userName));
   client.on('hostGame', () => handleNewGame(client)); //
   client.on('leaveLobby', () => removePlayer(io, client));
   client.on('hostLeaveGame', () => handleHostLeaveGame(io, client)) //
   client.on('hostStartedGame', () => handleHostStartsGame(io, client)) //
   client.on('refreshLobbyPlayers', () => refreshLobbyPlayers(io, client.currentRoomName)) //
+  client.on('hostRemovePlayer', (playerID) => io.to(playerID).emit('hostRemovedYouFromGame'))
 
 
 
