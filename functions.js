@@ -6,7 +6,7 @@ const POINTSTOWIN = 3
 
 /* Client Joins Room With Unique Id And Updates Num Of Players To Everyone In Room */
 /* checks all rooms and see if the roomname client entered is available */
-const handleJoinGame = (io, client, roomName) => {
+const handleJoinGame = (io, client, roomName, userName) => {
     let gameAvailable = false
     let PlayerRooms = Object.keys(ROOMDATA)
     roomName = roomName.toString()
@@ -19,12 +19,12 @@ const handleJoinGame = (io, client, roomName) => {
         }
     }
     if(gameAvailable) {
-        client.name = makeid(3);  // gives client name
+        client.name = userName;  // gives client name
         client.currentRoomName = roomName // gives client game joined
         ROOMDATA[roomName].push({name: client.name, id: client.id, bot: false}) // adds client to players list with properties
         client.join(roomName);
         // console.log('PLAYER JOINED:', roomName)
-        client.emit('handlePersonJoinAttempt', client.name);
+        client.emit('handlePersonJoinAttempt', client.id);
     } else {
         client.emit('handlePersonJoinAttempt', false);
     }
@@ -51,7 +51,7 @@ const handleNewGame = (client) => {
 const removePlayer = (io, client) => {
     let roomName = client.currentRoomName
     if(ROOMDATA[roomName]) {
-        ROOMDATA[roomName] = [...ROOMDATA[roomName].filter(player => player.name !== client.name)] // player.id !== client.id ?????
+        ROOMDATA[roomName] = [...ROOMDATA[roomName].filter(player => player.id !== client.id)] // player.id !== client.id ?????
     }
     refreshLobbyPlayers(io, roomName)
     client.leave(roomName)
@@ -87,7 +87,7 @@ const beginTournamentMatch = (io, client) => {
     if(!client.winner) {
         pairUpPlayersWithBots(io, client.currentRoomName) // pairs players with bots and then with other players
 
-        console.log('PLAYER LIST AFTER PAIRING', ROOMDATA[client.currentRoomName])
+        // console.log('PLAYER LIST AFTER PAIRING', ROOMDATA[client.currentRoomName])
     
         ROOMMETADATA[client.currentRoomName].matchStarted = false // never know 777777777777777777777777777777777777777777777777777777777777777777
     
